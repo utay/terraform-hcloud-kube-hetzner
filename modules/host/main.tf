@@ -48,7 +48,7 @@ resource "hcloud_server" "server" {
     user           = "root"
     private_key    = var.ssh_private_key
     agent_identity = local.ssh_agent_identity
-    host           = self.ipv4_address
+    host           = one(self.network).ip
     port           = var.ssh_port
   }
 
@@ -105,7 +105,7 @@ resource "null_resource" "registries" {
     user           = "root"
     private_key    = var.ssh_private_key
     agent_identity = local.ssh_agent_identity
-    host           = hcloud_server.server.ipv4_address
+    host           = one(hcloud_server.server.network).ip
     port           = var.ssh_port
   }
 
@@ -167,7 +167,7 @@ resource "null_resource" "zram" {
     user           = "root"
     private_key    = var.ssh_private_key
     agent_identity = local.ssh_agent_identity
-    host           = hcloud_server.server.ipv4_address
+    host           = one(hcloud_server.server.network).ip
     port           = var.ssh_port
   }
 
@@ -248,7 +248,7 @@ resource "null_resource" "os_upgrade_toggle" {
     user           = "root"
     private_key    = var.ssh_private_key
     agent_identity = local.ssh_agent_identity
-    host           = hcloud_server.server.ipv4_address
+    host           = one(hcloud_server.server.network).ip
     port           = var.ssh_port
   }
 

@@ -64,7 +64,7 @@ resource "null_resource" "configure_autoscaler" {
     user           = "root"
     private_key    = var.ssh_private_key
     agent_identity = local.ssh_agent_identity
-    host           = module.control_planes[keys(module.control_planes)[0]].ipv4_address
+    host           = module.control_planes[keys(module.control_planes)[0]].private_ipv4_address
     port           = var.ssh_port
   }
 
@@ -161,26 +161,27 @@ data "hcloud_servers" "autoscaled_nodes" {
   with_selector = "hcloud/node-group=${local.cluster_prefix}${each.value}"
 }
 
-resource "null_resource" "autoscaled_nodes_registries" {
-  for_each = local.autoscaled_nodes
-  triggers = {
-    registries = var.k3s_registries
-  }
-
-  connection {
-    user           = "root"
-    private_key    = var.ssh_private_key
-    agent_identity = local.ssh_agent_identity
-    host           = each.value.ipv4_address
-    port           = var.ssh_port
-  }
-
-  provisioner "file" {
-    content     = var.k3s_registries
-    destination = "/tmp/registries.yaml"
-  }
-
-  provisioner "remote-exec" {
-    inline = [local.k3s_registries_update_script]
-  }
-}
+# https://github.com/kube-hetzner/terraform-hcloud-kube-hetzner/pull/1567#discussion_r2039459721
+# resource "null_resource" "autoscaled_nodes_registries" {
+#   for_each = local.autoscaled_nodes
+#   triggers = {
+#     registries = var.k3s_registries
+#   }
+#
+#   connection {
+#     user           = "root"
+#     private_key    = var.ssh_private_key
+#     agent_identity = local.ssh_agent_identity
+#     host           = one(each.value.network).ip
+#     port           = var.ssh_port
+#   }
+#
+#   provisioner "file" {
+#     content     = var.k3s_registries
+#     destination = "/tmp/registries.yaml"
+#   }
+#
+#   provisioner "remote-exec" {
+#     inline = [local.k3s_registries_update_script]
+#   }
+# }

@@ -44,11 +44,14 @@ resource "hcloud_server" "server" {
     ]
   }
 
+}
+
+resource "null_resource" "wait_server_ready" {
   connection {
     user           = "root"
     private_key    = var.ssh_private_key
     agent_identity = local.ssh_agent_identity
-    host           = one(self.network).ip
+    host           = var.private_ipv4
     port           = var.ssh_port
   }
 
@@ -64,7 +67,7 @@ resource "hcloud_server" "server" {
   provisioner "local-exec" {
     command = <<-EOT
       timeout 600 bash <<EOF
-        until ssh ${local.ssh_args} -i /tmp/${random_string.identity_file.id} -o ConnectTimeout=2 -p ${var.ssh_port} root@${one(self.network).ip} true 2> /dev/null
+        until ssh ${local.ssh_args} -i /tmp/${random_string.identity_file.id} -o ConnectTimeout=2 -p ${var.ssh_port} root@${var.private_ipv4} true 2> /dev/null
         do
           echo "Waiting for MicroOS to become available..."
           sleep 3
@@ -94,6 +97,7 @@ resource "hcloud_server" "server" {
     ]
   }
 
+  depends_on = [hcloud_server.server, hcloud_server_network.server]
 }
 
 resource "null_resource" "registries" {
@@ -105,7 +109,7 @@ resource "null_resource" "registries" {
     user           = "root"
     private_key    = var.ssh_private_key
     agent_identity = local.ssh_agent_identity
-    host           = one(hcloud_server.server.network).ip
+    host           = var.private_ipv4
     port           = var.ssh_port
   }
 
@@ -118,7 +122,7 @@ resource "null_resource" "registries" {
     inline = [var.k3s_registries_update_script]
   }
 
-  depends_on = [hcloud_server.server]
+  depends_on = [hcloud_server.server, hcloud_server_network.server]
 }
 
 resource "hcloud_rdns" "server" {
@@ -167,7 +171,7 @@ resource "null_resource" "zram" {
     user           = "root"
     private_key    = var.ssh_private_key
     agent_identity = local.ssh_agent_identity
-    host           = one(hcloud_server.server.network).ip
+    host           = var.private_ipv4
     port           = var.ssh_port
   }
 
@@ -234,7 +238,7 @@ WantedBy=multi-user.target
     ])
   }
 
-  depends_on = [hcloud_server.server]
+  depends_on = [hcloud_server.server, hcloud_server_network.server]
 }
 
 # Resource to toggle transactional-update.timer based on automatically_upgrade_os setting
@@ -248,7 +252,7 @@ resource "null_resource" "os_upgrade_toggle" {
     user           = "root"
     private_key    = var.ssh_private_key
     agent_identity = local.ssh_agent_identity
-    host           = one(hcloud_server.server.network).ip
+    host           = var.private_ipv4
     port           = var.ssh_port
   }
 
@@ -268,6 +272,7 @@ resource "null_resource" "os_upgrade_toggle" {
 
   depends_on = [
     hcloud_server.server,
+    hcloud_server_network.server,
     null_resource.registries
   ]
 }

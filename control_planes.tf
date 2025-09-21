@@ -33,6 +33,7 @@ module "control_planes" {
   disable_ipv6                 = each.value.disable_ipv6
   ssh_bastion                  = local.ssh_bastion
   network_id                   = data.hcloud_network.k3s.id
+  gateway_ipv4                 = local.gateway_ipv4
 
   # We leave some room so 100 eventual Hetzner LBs that can be created perfectly safely
   # It leaves the subnet with 254 x 254 - 100 = 64416 IPs to use, so probably enough.

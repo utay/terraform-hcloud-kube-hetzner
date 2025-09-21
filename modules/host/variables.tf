@@ -157,6 +157,11 @@ variable "disable_ipv6" {
   description = "Whether to disable ipv4 on the server. If you disable ipv4 and ipv6 make sure you have an access to your private network."
 }
 
+variable "gateway_ipv4" {
+  type        = string
+  description = "The Hetzner gateway IP."
+}
+
 variable "network_id" {
   type        = number
   default     = null

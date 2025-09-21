@@ -112,7 +112,7 @@ resource "null_resource" "nat_router_await_cloud_init" {
     user           = "nat-router"
     private_key    = var.ssh_private_key
     agent_identity = local.ssh_agent_identity
-    host           = hcloud_server.nat_router[0].ipv4_address
+    host           = one(hcloud_server.nat_router[0].network).ip
     port           = var.ssh_port
   }
 

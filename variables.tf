@@ -706,6 +706,10 @@ variable "base_domain" {
   }
 }
 
+variable "domain_name" {
+  type = string
+}
+
 variable "placement_group_disable" {
   type        = bool
   default     = false

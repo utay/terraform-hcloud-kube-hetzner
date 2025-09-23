@@ -785,6 +785,9 @@ service:
 %{if var.lb_hostname != ""~}
     "load-balancer.hetzner.cloud/hostname": "${var.lb_hostname}"
 %{endif~}
+%{if var.domain_name != ""~}
+    "external-dns.alpha.kubernetes.io/hostname": "api.${var.domain_name}"
+%{endif~}
 %{endif~}
 ports:
 %{if var.traefik_redirect_to_https || !local.using_klipper_lb~}

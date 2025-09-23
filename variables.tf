@@ -553,6 +553,11 @@ variable "traefik_additional_trusted_ips" {
   description = "Additional Trusted IPs to pass to Traefik. These are the ones that go into the trustedIPs section of the Traefik helm values file."
 }
 
+variable "traefik_external_dns_hostnames" {
+  type    = list(string)
+  default = []
+}
+
 variable "traefik_version" {
   type        = string
   default     = ""
@@ -704,10 +709,6 @@ variable "base_domain" {
     condition     = can(regex("^(?:(?:(?:[A-Za-z0-9])|(?:[A-Za-z0-9](?:[A-Za-z0-9\\-]+)?[A-Za-z0-9]))+(\\.))+([A-Za-z]{2,})([\\/?])?([\\/?][A-Za-z0-9\\-%._~:\\/?#\\[\\]@!\\$&\\'\\(\\)\\*\\+,;=]+)?$", var.base_domain)) || var.base_domain == ""
     error_message = "It must be a valid domain name (FQDN)."
   }
-}
-
-variable "domain_name" {
-  type = string
 }
 
 variable "placement_group_disable" {

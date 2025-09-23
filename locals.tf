@@ -785,8 +785,8 @@ service:
 %{if var.lb_hostname != ""~}
     "load-balancer.hetzner.cloud/hostname": "${var.lb_hostname}"
 %{endif~}
-%{if var.domain_name != ""~}
-    "external-dns.alpha.kubernetes.io/hostname": "api.${var.domain_name}"
+%{if length(var.traefik_external_dns_hostnames) > 0~}
+    "external-dns.alpha.kubernetes.io/hostname": "${join(",", var.traefik_external_dns_hostnames)}"
 %{endif~}
 %{endif~}
 ports:

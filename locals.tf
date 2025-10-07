@@ -569,7 +569,7 @@ endpointRoutes:
 
 loadBalancer:
   # Enable LoadBalancer & NodePort XDP Acceleration (direct routing (routingMode=native) is recommended to achieve optimal performance)
-  acceleration: native
+  acceleration: best-effort
 
 bpf:
   # Enable eBPF-based Masquerading ("The eBPF-based implementation is the most efficient implementation")
@@ -655,6 +655,10 @@ node:
           - matchExpressions:
               - key: "node-role.kubernetes.io/control-plane"
                 operator: DoesNotExist
+              - key: "instance.hetzner.cloud/provided-by"
+                operator: In
+                values:
+                  - cloud
 EOT
   : "")
 
@@ -691,6 +695,9 @@ controller:
   hetzner_ccm_values = var.hetzner_ccm_values != "" ? var.hetzner_ccm_values : <<EOT
 networking:
   enabled: true
+  clusterCIDR: "${var.cluster_ipv4_cidr}"
+robot:
+  enabled: true
 args:
   cloud-provider: hcloud
   allow-untagged-cloud: ""
@@ -708,6 +715,8 @@ env:
     value: "${!local.using_klipper_lb}"
   HCLOUD_LOAD_BALANCERS_DISABLE_PRIVATE_INGRESS:
     value: "true"
+  HCLOUD_NETWORK_ROUTES_ENABLED:
+    value: "false"
 # Use host network to avoid circular dependency with CNI
 hostNetwork: true
   EOT

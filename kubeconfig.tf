@@ -35,7 +35,7 @@ locals {
       hcloud_load_balancer.control_plane.*.ipv4[0]
       : (
         var.nat_router != null ?
-        hcloud_server.nat_router[0].ipv4_address
+        one(hcloud_server.nat_router[0].network).ip
         : hcloud_load_balancer_network.control_plane.*.ip[0]
       )
     )

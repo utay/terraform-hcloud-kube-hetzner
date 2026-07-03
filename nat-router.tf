@@ -195,7 +195,7 @@ resource "terraform_data" "nat_router_await_cloud_init" {
     user           = "nat-router"
     private_key    = var.ssh_private_key
     agent_identity = local.ssh_agent_identity
-    host           = hcloud_server.nat_router[count.index].ipv4_address
+    host           = one(hcloud_server.nat_router[count.index].network).ip
     port           = var.ssh_port
   }
 
@@ -225,7 +225,7 @@ resource "terraform_data" "nat_router_fail2ban" {
     user           = var.nat_router.enable_sudo ? "nat-router" : "root"
     private_key    = var.ssh_private_key
     agent_identity = local.ssh_agent_identity
-    host           = hcloud_server.nat_router[count.index].ipv4_address
+    host           = one(hcloud_server.nat_router[count.index].network).ip
     port           = var.ssh_port
   }
 

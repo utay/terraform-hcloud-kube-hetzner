@@ -359,7 +359,7 @@ locals {
   use_nat_router = var.nat_router != null
 
   ssh_bastion = local.use_nat_router ? {
-    bastion_host        = hcloud_server.nat_router[0].ipv4_address
+    bastion_host        = one(hcloud_server.nat_router[0].network).ip
     bastion_port        = var.ssh_port
     bastion_user        = "nat-router"
     bastion_private_key = var.ssh_private_key
